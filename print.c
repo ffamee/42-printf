@@ -11,18 +11,7 @@
 /* ************************************************************************** */
 
 #include "ft_printf.h"
-
-static size_t	ft_strlen(const char *c)
-{
-	size_t	i;
-
-	i = 0;
-	while (c[i])
-	{
-		i++;
-	}
-	return (i);
-}
+#include <stdio.h>
 
 int	ft_putchar(char c)
 {
@@ -53,26 +42,42 @@ int	ft_putstr(char *s)
 
 int	ft_putnbr_base(int n, const char *base)
 {
-	char		a;
-	int			b;
-	static int	len;
-
-	len = 0;
-	b = ft_strlen(base);
 	if (n == -2147483648)
+	{
 		write(1, "-2147483648", 11);
+		return (11);
+	}
 	else
 	{
 		if (n < 0)
-		{
-			write(1, "-", 1);
-			n = -n;
-		}
-		if (n >= 10)
-			ft_putnbr_base(n / b, base);
-		len++;
-		a = base[n % b];
-		write(1, &a, 1);
+			return (ft_putchar('-') + ft_putnbr_base(-n, base));
+		else if (n >= 10)
+			return (ft_putnbr_base(n / 10, base) + ft_putchar(base[n % 10]));
+		else
+			return (ft_putchar(base[n % 10]));
 	}
-	return (len);
+}
+
+int	ft_putunbr_base(unsigned int n, const char *base)
+{
+	unsigned int	b;
+
+	b = (unsigned int)ft_strlen(base);
+	if (n >= b)
+		return (ft_putunbr_base(n / b, base) + ft_putchar(base[n % b]));
+	else
+		return (ft_putchar(base[n % b]));
+}
+
+int	ft_putlnbr_base(unsigned long long n, const char *base)
+{
+	if (n == 0)
+		return (ft_putstr("(nil)"));
+	else
+	{
+		if (n >= 16)
+			return (ft_putlnbr_base(n / 16, base) + ft_putchar(base[n % 16]));
+		else
+			return (ft_putstr("0x") + ft_putchar(base[n % 16]));
+	}
 }
